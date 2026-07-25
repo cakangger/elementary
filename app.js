@@ -407,3 +407,8 @@ options.forEach(btn => {
 
 playAgainBtn.addEventListener('click', () => showScreen('subject-screen'));
 homeBtn.addEventListener('click', () => showScreen('start-screen'));
+
+document.getElementById('quit-quiz-btn').addEventListener('click', () => {
+    clearInterval(timer);
+    showScreen('subject-screen');
+});
