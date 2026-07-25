@@ -455,9 +455,11 @@ document.querySelectorAll('button').forEach(btn => {
     
     // Hover Sound
     btn.addEventListener('mouseenter', () => {
-        // A subtle tick/motion sound for hovering
-        const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-        hoverSound.volume = 0.2; // Keep it quiet so it isn't overwhelming
-        hoverSound.play().catch(e => console.log('Hover sound error:', e));
+        // Browsers block audio until the first click, so we only play hover sounds after interaction
+        if (audioInitialized) {
+            const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+            hoverSound.volume = 0.6; // Increased volume so it's easier to hear
+            hoverSound.play().catch(e => console.log('Hover sound error:', e));
+        }
     });
 });
