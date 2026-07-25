@@ -314,28 +314,35 @@ async function joinFirebaseRoom() {
     const pin = joinPinInput.value.trim();
     if (!name || !pin) return;
     
-    const rRef = db.ref('rooms/' + pin);
-    const snapshot = await rRef.get();
-    if (snapshot.exists() && snapshot.val().status === 'waiting') {
-        playerName = name;
-        roomPin = pin;
-        roomRef = rRef;
-        
-        currentClass = snapshot.val().class;
-        currentSubject = snapshot.val().subject;
-        
-        const playerRef = db.ref(`rooms/${pin}/players/${playerId}`);
-        playerRef.set({ name: playerName, score: 0, hasAnswered: false });
-        playerRef.onDisconnect().remove();
-        
-        startMultiBtn.style.display = 'none';
-        waitingHostText.style.display = 'block';
-        lobbyPinDisplay.textContent = roomPin;
-        joinError.style.display = 'none';
-        
-        setupRoomListeners();
-        showScreen('lobby-screen');
-    } else {
+    try {
+        const rRef = db.ref('rooms/' + pin);
+        const snapshot = await rRef.once('value');
+        if (snapshot.exists() && snapshot.val().status === 'waiting') {
+            playerName = name;
+            roomPin = pin;
+            roomRef = rRef;
+            
+            currentClass = snapshot.val().class;
+            currentSubject = snapshot.val().subject;
+            
+            const playerRef = db.ref(`rooms/${pin}/players/${playerId}`);
+            playerRef.set({ name: playerName, score: 0, hasAnswered: false });
+            playerRef.onDisconnect().remove();
+            
+            startMultiBtn.style.display = 'none';
+            waitingHostText.style.display = 'block';
+            lobbyPinDisplay.textContent = roomPin;
+            joinError.style.display = 'none';
+            
+            setupRoomListeners();
+            showScreen('lobby-screen');
+        } else {
+            joinError.textContent = "Room not found or already playing!";
+            joinError.style.display = 'block';
+        }
+    } catch (error) {
+        console.error("Error joining room:", error);
+        joinError.textContent = "Database error. Check console.";
         joinError.style.display = 'block';
     }
 }
