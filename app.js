@@ -524,7 +524,10 @@ function handleTimeout() {
     options.forEach(opt => opt.classList.add('disabled'));
     options[currentQ.answer].classList.add('correct');
     
-    if(wrongSound) wrongSound.play().catch(e=>{});
+    // Play wrong sound (timeout = wrong)
+    const wSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+    wSound.volume = 0.6;
+    wSound.play().catch(e=>{});
     
     if (isMultiplayer) {
         if (!isHost) {
@@ -549,11 +552,15 @@ function selectAnswer(selectedIndex) {
         score += 10; 
         scoreDisplay.textContent = score;
         options[selectedIndex].classList.add('correct');
-        if(correctSound) correctSound.play().catch(e=>{});
+        const cSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+        cSound.volume = 0.6;
+        cSound.play().catch(e=>{});
     } else {
         options[selectedIndex].classList.add('wrong');
         options[currentQ.answer].classList.add('correct');
-        if(wrongSound) wrongSound.play().catch(e=>{});
+        const wSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+        wSound.volume = 0.6;
+        wSound.play().catch(e=>{});
     }
     
     if (isMultiplayer) {
