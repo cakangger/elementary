@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartKid Quiz!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <div class="lang-selector">
+                <button id="lang-en" class="lang-btn active">EN</button>
+                <button id="lang-id" class="lang-btn">ID</button>
+            </div>
+            <h1 class="logo">Brainy<span>Kid</span>!</h1>
+            <p id="t-subtitle" class="subtitle">Are you ready to test your knowledge?</p>
+            <button id="start-btn" class="btn primary-btn pulse"><span id="t-startBtn">Play Now!</span></button>
+        </div>
+
+        <!-- Subject Selection Screen -->
+        <div id="subject-screen" class="screen">
+            <h2 id="t-chooseSubject">Choose Your Subject</h2>
+            <div class="subject-grid">
+                <button class="subject-btn math" data-subject="math">
+                    <span class="icon">🔢</span> <span id="t-subjMath">Math</span>
+                </button>
+                <button class="subject-btn indo" data-subject="indo">
+                    <span class="icon">🇮🇩</span> <span id="t-subjIndo">Bahasa Indonesia</span>
+                </button>
+                <button class="subject-btn english" data-subject="english">
+                    <span class="icon">🇬🇧</span> <span id="t-subjEnglish">English</span>
+                </button>
+                <button class="subject-btn general" data-subject="general">
+                    <span class="icon">👩‍🚀</span> <span id="t-subjGeneral">Professions</span>
+                </button>
+            </div>
+            <button id="back-to-start" class="btn secondary-btn small"><span id="t-back">Back</span></button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div class="score-display"><span id="t-score">Score: </span><span id="current-score">0</span></div>
+                <div class="timer">
+                    <div class="timer-circle">
+                        <span id="time-left">20</span>
+                    </div>
+                </div>
+                <div class="question-tracker"><span id="t-question">Question </span><span id="current-q-num">1</span>/<span id="total-q-num">5</span></div>
+            </div>
+            <div class="question-container">
+                <h2 id="question-text">Question goes here...</h2>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn opt-red" data-index="0"><span class="shape">▲</span><span class="opt-text">Option 1</span></button>
+                <button class="option-btn opt-blue" data-index="1"><span class="shape">◆</span><span class="opt-text">Option 2</span></button>
+                <button class="option-btn opt-yellow" data-index="2"><span class="shape">●</span><span class="opt-text">Option 3</span></button>
+                <button class="option-btn opt-green" data-index="3"><span class="shape">■</span><span class="opt-text">Option 4</span></button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <h2 id="t-quizComplete">Quiz Complete!</h2>
+            <div class="final-score-box">
+                <p id="t-finalScoreTitle">Your Final Score</p>
+                <h1 id="final-score">0</h1>
+            </div>
+            <p id="feedback-message">Great Job!</p>
+            <div class="result-actions">
+                <button id="play-again-btn" class="btn primary-btn pulse"><span id="t-playAgain">Play Again</span></button>
+                <button id="home-btn" class="btn secondary-btn"><span id="t-mainMenu">Main Menu</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio Elements for Sound Effects -->
+    <audio id="correct-sound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3"></audio>
+    <audio id="wrong-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7314290747.mp3?filename=error-126627.mp3"></audio>
+
+    <script src="app.js"></script>
+</body>
+</html>
