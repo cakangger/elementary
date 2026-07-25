@@ -444,12 +444,20 @@ document.body.addEventListener('click', () => {
     }
 }, true);
 
-// Add click sound to all buttons
+// Add click and hover sounds to all buttons
 document.querySelectorAll('button').forEach(btn => {
+    // Click Sound
     btn.addEventListener('click', () => {
-        // Use a new Audio object to allow overlapping sounds and use a highly reliable MP3 source
         const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         clickSound.volume = 0.5;
         clickSound.play().catch(e => console.log('Click sound error:', e));
+    });
+    
+    // Hover Sound
+    btn.addEventListener('mouseenter', () => {
+        // A subtle tick/motion sound for hovering
+        const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+        hoverSound.volume = 0.2; // Keep it quiet so it isn't overwhelming
+        hoverSound.play().catch(e => console.log('Hover sound error:', e));
     });
 });
