@@ -5,7 +5,7 @@ const firebaseConfig = {
     storageBucket: "elementaryquiz.firebasestorage.app",
     messagingSenderId: "517327642692",
     appId: "1:517327642692:web:397ecf73521b31ca64dc11",
-    databaseURL: "https://elementaryquiz-default-rtdb.firebaseio.com" // Attempting US Central default
+    databaseURL: "https://elementaryquiz-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -299,7 +299,7 @@ function createFirebaseRoom(subject) {
             alert("Could not connect to Firebase. Please check your databaseURL or internet connection.");
             window.location.reload();
         }
-    }, 5000);
+    }, 10000);
     
     roomRef = db.ref('rooms/' + roomPin);
     roomRef.set({
@@ -338,7 +338,7 @@ async function joinFirebaseRoom() {
             joinError.textContent = "Connection timeout! Check databaseURL.";
             joinError.style.display = 'block';
         }
-    }, 5000);
+    }, 10000);
     
     try {
         const rRef = db.ref('rooms/' + pin);
