@@ -4,7 +4,8 @@ const firebaseConfig = {
     projectId: "elementaryquiz",
     storageBucket: "elementaryquiz.firebasestorage.app",
     messagingSenderId: "517327642692",
-    appId: "1:517327642692:web:397ecf73521b31ca64dc11"
+    appId: "1:517327642692:web:397ecf73521b31ca64dc11",
+    databaseURL: "https://elementaryquiz-default-rtdb.asia-southeast1.firebasedatabase.app" // Attempting Asia region first as it's common for ID
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -291,6 +292,15 @@ function createFirebaseRoom(subject) {
     roomPin = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit pin
     lobbyPinDisplay.textContent = roomPin;
     
+    // Add a connection timeout
+    let connected = false;
+    setTimeout(() => {
+        if (!connected) {
+            alert("Could not connect to Firebase. Please check your databaseURL or internet connection.");
+            window.location.reload();
+        }
+    }, 5000);
+    
     roomRef = db.ref('rooms/' + roomPin);
     roomRef.set({
         status: 'waiting',
@@ -298,15 +308,19 @@ function createFirebaseRoom(subject) {
         subject: currentSubject,
         currentQuestionIndex: 0,
         hostId: playerId
+    }).then(() => {
+        connected = true;
+        roomRef.onDisconnect().remove(); // Auto-delete room if host leaves
+        
+        startMultiBtn.style.display = 'block';
+        waitingHostText.style.display = 'none';
+        
+        setupRoomListeners();
+        showScreen('lobby-screen');
+    }).catch(err => {
+        connected = true;
+        alert("Firebase Error: " + err.message);
     });
-    
-    roomRef.onDisconnect().remove(); // Auto-delete room if host leaves
-    
-    startMultiBtn.style.display = 'block';
-    waitingHostText.style.display = 'none';
-    
-    setupRoomListeners();
-    showScreen('lobby-screen');
 }
 
 async function joinFirebaseRoom() {
@@ -314,9 +328,24 @@ async function joinFirebaseRoom() {
     const pin = joinPinInput.value.trim();
     if (!name || !pin) return;
     
+    joinRoomBtn.textContent = "Connecting...";
+    
+    // Connection timeout
+    let connected = false;
+    setTimeout(() => {
+        if (!connected) {
+            joinRoomBtn.textContent = "Join";
+            joinError.textContent = "Connection timeout! Check databaseURL.";
+            joinError.style.display = 'block';
+        }
+    }, 5000);
+    
     try {
         const rRef = db.ref('rooms/' + pin);
         const snapshot = await rRef.once('value');
+        connected = true;
+        joinRoomBtn.textContent = "Join";
+        
         if (snapshot.exists() && snapshot.val().status === 'waiting') {
             playerName = name;
             roomPin = pin;
@@ -341,6 +370,8 @@ async function joinFirebaseRoom() {
             joinError.style.display = 'block';
         }
     } catch (error) {
+        connected = true;
+        joinRoomBtn.textContent = "Join";
         console.error("Error joining room:", error);
         joinError.textContent = "Database error. Check console.";
         joinError.style.display = 'block';
