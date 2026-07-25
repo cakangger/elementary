@@ -154,6 +154,9 @@ const feedbackMessage = document.getElementById('feedback-message');
 
 const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
+const mainBgm = document.getElementById('main-bgm');
+const quizBgm = document.getElementById('quiz-bgm');
+let audioInitialized = false;
 
 // I18N DOM Elements
 const tSubtitle = document.getElementById('t-subtitle');
@@ -226,9 +229,25 @@ function setLanguage(lang) {
     }
 }
 
+function manageAudio(screenId) {
+    if (!audioInitialized) return;
+    
+    if (screenId === 'quiz-screen') {
+        mainBgm.pause();
+        quizBgm.currentTime = 0;
+        quizBgm.play().catch(e => console.log(e));
+    } else {
+        quizBgm.pause();
+        if (mainBgm.paused) {
+            mainBgm.play().catch(e => console.log(e));
+        }
+    }
+}
+
 function showScreen(screenId) {
     screens.forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+    manageAudio(screenId);
 }
 
 function initQuiz(subject) {
@@ -412,3 +431,15 @@ document.getElementById('quit-quiz-btn').addEventListener('click', () => {
     clearInterval(timer);
     showScreen('subject-screen');
 });
+
+// Initialize audio on first click anywhere
+document.body.addEventListener('click', () => {
+    if (!audioInitialized) {
+        audioInitialized = true;
+        mainBgm.volume = 0.3; // slightly lower volume for background music
+        quizBgm.volume = 0.3;
+        if (!document.getElementById('quiz-screen').classList.contains('active')) {
+            mainBgm.play().catch(e => console.log(e));
+        }
+    }
+}, true);
