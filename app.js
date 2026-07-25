@@ -1,5 +1,21 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAf8jwUDifdo5TCcDmzQBRdLjmT8w5W8fo",
+    authDomain: "elementaryquiz.firebaseapp.com",
+    projectId: "elementaryquiz",
+    storageBucket: "elementaryquiz.firebasestorage.app",
+    messagingSenderId: "517327642692",
+    appId: "1:517327642692:web:397ecf73521b31ca64dc11"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Data
 const questionsDb = {
-    "1": { // Class 1 Questions
+    "1": { // Class 1
         math: [
             { q: {en: "What is 1 + 1?", id: "Berapa 1 + 1?"}, options: {en: ["1", "2", "3", "4"], id: ["1", "2", "3", "4"]}, answer: 1 },
             { q: {en: "What is 2 + 2?", id: "Berapa 2 + 2?"}, options: {en: ["3", "4", "5", "6"], id: ["3", "4", "5", "6"]}, answer: 1 },
@@ -48,7 +64,13 @@ const questionsDb = {
             { q: {en: "Who fixes our teeth?", id: "Siapa yang mengobati gigi kita?"}, options: {en: ["Dentist", "Eye Doctor", "Nurse", "Chef"], id: ["Dokter Gigi", "Dokter Mata", "Perawat", "Koki"]}, answer: 0 },
             { q: {en: "Who builds houses?", id: "Siapa yang membangun rumah?"}, options: {en: ["Builder", "Teacher", "Doctor", "Pilot"], id: ["Tukang Bangunan", "Guru", "Dokter", "Pilot"]}, answer: 0 }
         ]
-    }
+    },
+    // Placeholders for Classes 2-6
+    "2": { math: [], indo: [], english: [], general: [] },
+    "3": { math: [], indo: [], english: [], general: [] },
+    "4": { math: [], indo: [], english: [], general: [] },
+    "5": { math: [], indo: [], english: [], general: [] },
+    "6": { math: [], indo: [], english: [], general: [] }
 };
 
 const i18n = {
@@ -77,7 +99,23 @@ const i18n = {
         subjMath: "Math",
         subjIndo: "Bahasa Indonesia",
         subjEnglish: "English",
-        subjGeneral: "Professions"
+        subjGeneral: "Professions",
+        chooseMode: "Choose Game Mode",
+        singlePlayer: "Single Player",
+        multiPlayer: "Multiplayer",
+        multiHub: "Multiplayer",
+        hostRoom: "Host Room",
+        joinRoom: "Join Room",
+        joinTitle: "Join a Room",
+        joinBtn: "Join",
+        waitingPlayers: "Waiting for players...",
+        startMulti: "Start Game",
+        quitLobby: "Quit Room",
+        podiumTitle: "Leaderboard",
+        podiumHome: "Main Menu",
+        backStartMode: "Back",
+        backModeHub: "Back",
+        backHubJoin: "Back"
     },
     id: {
         subtitle: "Apakah kamu siap menguji pengetahuanmu?",
@@ -104,7 +142,23 @@ const i18n = {
         subjMath: "Matematika",
         subjIndo: "Bahasa Indonesia",
         subjEnglish: "Bahasa Inggris",
-        subjGeneral: "Profesi"
+        subjGeneral: "Profesi",
+        chooseMode: "Pilih Mode Permainan",
+        singlePlayer: "Pemain Tunggal",
+        multiPlayer: "Banyak Pemain",
+        multiHub: "Banyak Pemain",
+        hostRoom: "Buat Ruangan",
+        joinRoom: "Gabung Ruangan",
+        joinTitle: "Gabung ke Ruangan",
+        joinBtn: "Gabung",
+        waitingPlayers: "Menunggu pemain lain...",
+        startMulti: "Mulai Permainan",
+        quitLobby: "Keluar Ruangan",
+        podiumTitle: "Papan Peringkat",
+        podiumHome: "Menu Utama",
+        backStartMode: "Kembali",
+        backModeHub: "Kembali",
+        backHubJoin: "Kembali"
     }
 };
 
@@ -117,13 +171,22 @@ let score = 0;
 let timer;
 let timeLeft = 20;
 const TIME_LIMIT = 20;
+let audioInitialized = false;
 
-// Helper to get questions, falling back to Class 1 if the selected class isn't fully populated yet
+// Multiplayer State
+let isMultiplayer = false;
+let isHost = false;
+let roomPin = null;
+let playerId = Math.random().toString(36).substring(2, 10);
+let playerName = "";
+let roomRef = null;
+let playersData = {};
+let dbListeners = [];
+
 function getQuestions(cls, subj) {
     if (questionsDb[cls] && questionsDb[cls][subj] && questionsDb[cls][subj].length > 0) {
         return questionsDb[cls][subj];
     }
-    // Fallback to Class 1 questions if the class doesn't have its own database yet
     return questionsDb["1"][subj];
 }
 
@@ -136,10 +199,8 @@ const backToStartFromClassBtn = document.getElementById('back-to-start-from-clas
 const backToClassFromSubjectBtn = document.getElementById('back-to-class');
 const playAgainBtn = document.getElementById('play-again-btn');
 const homeBtn = document.getElementById('home-btn');
-
 const langEnBtn = document.getElementById('lang-en');
 const langIdBtn = document.getElementById('lang-id');
-
 const questionText = document.getElementById('question-text');
 const options = document.querySelectorAll('.option-btn');
 const optTexts = document.querySelectorAll('.opt-text');
@@ -148,7 +209,6 @@ const timeDisplay = document.getElementById('time-left');
 const timerCircle = document.querySelector('.timer-circle');
 const currentQNum = document.getElementById('current-q-num');
 const totalQNum = document.getElementById('total-q-num');
-
 const finalScore = document.getElementById('final-score');
 const feedbackMessage = document.getElementById('feedback-message');
 
@@ -156,33 +216,29 @@ const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
 const mainBgm = document.getElementById('main-bgm');
 const quizBgm = document.getElementById('quiz-bgm');
-let audioInitialized = false;
 
-// I18N DOM Elements
+// Multiplayer DOM
+const modeSingleBtn = document.getElementById('mode-single');
+const modeMultiBtn = document.getElementById('mode-multi');
+const multiHostBtn = document.getElementById('multi-host');
+const multiJoinBtn = document.getElementById('multi-join');
+const joinNameInput = document.getElementById('join-name');
+const joinPinInput = document.getElementById('join-pin');
+const joinRoomBtn = document.getElementById('join-room-btn');
+const joinError = document.getElementById('join-error');
+const lobbyPinDisplay = document.getElementById('lobby-pin');
+const playerListDiv = document.getElementById('player-list');
+const startMultiBtn = document.getElementById('start-multi-btn');
+const waitingHostText = document.getElementById('waiting-host-text');
+const quitLobbyBtn = document.getElementById('quit-lobby-btn');
+const backToStartFromMode = document.getElementById('back-to-start-from-mode');
+const backToModeFromHub = document.getElementById('back-to-mode-from-hub');
+const backToHubFromJoin = document.getElementById('back-to-hub-from-join');
+const podiumHomeBtn = document.getElementById('podium-home-btn');
+
+// I18N DOM Elements (only updating some core ones for brevity, static translation runs dynamically)
 const tSubtitle = document.getElementById('t-subtitle');
-const tStartBtn = document.getElementById('t-startBtn');
-const tChooseClass = document.getElementById('t-chooseClass');
-const tClass1 = document.getElementById('t-class1');
-const tClass2 = document.getElementById('t-class2');
-const tClass3 = document.getElementById('t-class3');
-const tClass4 = document.getElementById('t-class4');
-const tClass5 = document.getElementById('t-class5');
-const tClass6 = document.getElementById('t-class6');
-const tChooseSubject = document.getElementById('t-chooseSubject');
-const tSubjMath = document.getElementById('t-subjMath');
-const tSubjIndo = document.getElementById('t-subjIndo');
-const tSubjEnglish = document.getElementById('t-subjEnglish');
-const tSubjGeneral = document.getElementById('t-subjGeneral');
-const tBackClass = document.getElementById('t-backClass');
-const tBackSubject = document.getElementById('t-backSubject');
-const tScore = document.getElementById('t-score');
-const tQuestion = document.getElementById('t-question');
-const tQuizComplete = document.getElementById('t-quizComplete');
-const tFinalScoreTitle = document.getElementById('t-finalScoreTitle');
-const tPlayAgain = document.getElementById('t-playAgain');
-const tMainMenu = document.getElementById('t-mainMenu');
 
-// Functions
 function setLanguage(lang) {
     currentLang = lang;
     
@@ -194,31 +250,12 @@ function setLanguage(lang) {
         langEnBtn.classList.remove('active');
     }
 
-    // Update static texts
-    tSubtitle.textContent = i18n[lang].subtitle;
-    tStartBtn.textContent = i18n[lang].startBtn;
-    tChooseClass.textContent = i18n[lang].chooseClass;
-    tClass1.textContent = i18n[lang].class1;
-    tClass2.textContent = i18n[lang].class2;
-    tClass3.textContent = i18n[lang].class3;
-    tClass4.textContent = i18n[lang].class4;
-    tClass5.textContent = i18n[lang].class5;
-    tClass6.textContent = i18n[lang].class6;
-    tChooseSubject.textContent = i18n[lang].chooseSubject;
-    tSubjMath.textContent = i18n[lang].subjMath;
-    tSubjIndo.textContent = i18n[lang].subjIndo;
-    tSubjEnglish.textContent = i18n[lang].subjEnglish;
-    tSubjGeneral.textContent = i18n[lang].subjGeneral;
-    tBackClass.textContent = i18n[lang].backClass;
-    tBackSubject.textContent = i18n[lang].backSubject;
-    tScore.textContent = i18n[lang].score;
-    tQuestion.textContent = i18n[lang].question;
-    tQuizComplete.textContent = i18n[lang].quizComplete;
-    tFinalScoreTitle.textContent = i18n[lang].finalScoreTitle;
-    tPlayAgain.textContent = i18n[lang].playAgain;
-    tMainMenu.textContent = i18n[lang].mainMenu;
+    // Dynamic Translation Loop
+    Object.keys(i18n[lang]).forEach(key => {
+        const el = document.getElementById(`t-${key}`);
+        if(el) el.textContent = i18n[lang][key];
+    });
     
-    // Refresh question texts if in active quiz
     if (document.getElementById('quiz-screen').classList.contains('active')) {
         const qList = getQuestions(currentClass, currentSubject);
         const currentQ = qList[currentQuestionIndex];
@@ -235,11 +272,11 @@ function manageAudio(screenId) {
     if (screenId === 'quiz-screen') {
         mainBgm.pause();
         quizBgm.currentTime = 0;
-        quizBgm.play().catch(e => console.log(e));
+        quizBgm.play().catch(e => {});
     } else {
         quizBgm.pause();
         if (mainBgm.paused) {
-            mainBgm.play().catch(e => console.log(e));
+            mainBgm.play().catch(e => {});
         }
     }
 }
@@ -249,6 +286,140 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
     manageAudio(screenId);
 }
+
+// ---------------- Multiplayer Logic ----------------
+
+function createFirebaseRoom(subject) {
+    currentSubject = subject;
+    roomPin = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit pin
+    lobbyPinDisplay.textContent = roomPin;
+    
+    roomRef = ref(db, 'rooms/' + roomPin);
+    set(roomRef, {
+        status: 'waiting',
+        class: currentClass,
+        subject: currentSubject,
+        currentQuestionIndex: 0,
+        hostId: playerId
+    });
+    
+    onDisconnect(roomRef).remove(); // Auto-delete room if host leaves
+    
+    startMultiBtn.style.display = 'block';
+    waitingHostText.style.display = 'none';
+    
+    setupRoomListeners();
+    showScreen('lobby-screen');
+}
+
+async function joinFirebaseRoom() {
+    const name = joinNameInput.value.trim();
+    const pin = joinPinInput.value.trim();
+    if (!name || !pin) return;
+    
+    const rRef = ref(db, 'rooms/' + pin);
+    const snapshot = await get(rRef);
+    if (snapshot.exists() && snapshot.val().status === 'waiting') {
+        playerName = name;
+        roomPin = pin;
+        roomRef = rRef;
+        
+        currentClass = snapshot.val().class;
+        currentSubject = snapshot.val().subject;
+        
+        const playerRef = ref(db, `rooms/${pin}/players/${playerId}`);
+        set(playerRef, { name: playerName, score: 0, hasAnswered: false });
+        onDisconnect(playerRef).remove();
+        
+        startMultiBtn.style.display = 'none';
+        waitingHostText.style.display = 'block';
+        lobbyPinDisplay.textContent = roomPin;
+        joinError.style.display = 'none';
+        
+        setupRoomListeners();
+        showScreen('lobby-screen');
+    } else {
+        joinError.style.display = 'block';
+    }
+}
+
+function setupRoomListeners() {
+    // Clear old listeners
+    dbListeners.forEach(unsub => unsub());
+    dbListeners = [];
+    
+    // Listen to players joining/updating
+    const unsubPlayers = onValue(ref(db, `rooms/${roomPin}/players`), (snapshot) => {
+        playersData = snapshot.val() || {};
+        renderPlayerList();
+    });
+    dbListeners.push(unsubPlayers);
+    
+    // Listen to game status
+    const unsubStatus = onValue(ref(db, `rooms/${roomPin}/status`), (snapshot) => {
+        if (!snapshot.exists()) {
+            if (document.getElementById('lobby-screen').classList.contains('active') || document.getElementById('quiz-screen').classList.contains('active')) {
+                alert(i18n[currentLang].quizComplete || "Room closed.");
+                window.location.reload();
+            }
+            return;
+        }
+        
+        const status = snapshot.val();
+        if (status === 'playing' && document.getElementById('lobby-screen').classList.contains('active')) {
+            initQuiz(currentSubject);
+        } else if (status === 'finished') {
+            showPodium();
+        }
+    });
+    dbListeners.push(unsubStatus);
+    
+    // Listen to question changes
+    const unsubQ = onValue(ref(db, `rooms/${roomPin}/currentQuestionIndex`), (snapshot) => {
+        if (snapshot.exists()) {
+            const newIndex = snapshot.val();
+            if (newIndex > currentQuestionIndex && document.getElementById('quiz-screen').classList.contains('active')) {
+                currentQuestionIndex = newIndex;
+                loadQuestion();
+            }
+        }
+    });
+    dbListeners.push(unsubQ);
+}
+
+function renderPlayerList() {
+    playerListDiv.innerHTML = '';
+    Object.values(playersData).forEach(p => {
+        const div = document.createElement('div');
+        div.textContent = p.name + " (" + p.score + ")";
+        div.style.padding = '0.5rem 1rem';
+        div.style.background = 'white';
+        div.style.borderRadius = '20px';
+        div.style.fontWeight = 'bold';
+        div.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        playerListDiv.appendChild(div);
+    });
+}
+
+function showPodium() {
+    showScreen('podium-screen');
+    const sortedPlayers = Object.values(playersData).sort((a, b) => b.score - a.score);
+    
+    if (sortedPlayers[0]) {
+        document.getElementById('podium-1-name').textContent = sortedPlayers[0].name;
+        document.getElementById('podium-1-score').textContent = sortedPlayers[0].score;
+    }
+    if (sortedPlayers[1]) {
+        document.getElementById('podium-2-name').textContent = sortedPlayers[1].name;
+        document.getElementById('podium-2-score').textContent = sortedPlayers[1].score;
+    }
+    if (sortedPlayers[2]) {
+        document.getElementById('podium-3-name').textContent = sortedPlayers[2].name;
+        document.getElementById('podium-3-score').textContent = sortedPlayers[2].score;
+    }
+}
+
+// ---------------- Core Quiz Logic ----------------
 
 function initQuiz(subject) {
     currentSubject = subject;
@@ -310,49 +481,61 @@ function handleTimeout() {
     const qList = getQuestions(currentClass, currentSubject);
     const currentQ = qList[currentQuestionIndex];
     options.forEach(opt => opt.classList.add('disabled'));
-    
     options[currentQ.answer].classList.add('correct');
     
-    if(wrongSound) {
-        wrongSound.currentTime = 0;
-        let playPromise = wrongSound.play();
-        if (playPromise !== undefined) playPromise.catch(e => console.log(e));
-    }
+    if(wrongSound) wrongSound.play().catch(e=>{});
     
-    setTimeout(nextQuestion, 2000);
+    if (isMultiplayer) {
+        if (!isHost) {
+            update(ref(db, `rooms/${roomPin}/players/${playerId}`), { hasAnswered: true });
+        }
+        if (isHost) setTimeout(hostNextQuestion, 4000);
+    } else {
+        setTimeout(nextQuestion, 2000);
+    }
 }
 
 function selectAnswer(selectedIndex) {
+    if (options[0].classList.contains('disabled')) return; // block double clicks
     clearInterval(timer);
+    
     const qList = getQuestions(currentClass, currentSubject);
     const currentQ = qList[currentQuestionIndex];
     
     options.forEach(opt => opt.classList.add('disabled'));
     
     if (selectedIndex === currentQ.answer) {
-        // Correct - strictly 10 points per answer (no time bonus)
         score += 10; 
         scoreDisplay.textContent = score;
         options[selectedIndex].classList.add('correct');
-        
-        if(correctSound) {
-            correctSound.currentTime = 0;
-            let playPromise = correctSound.play();
-            if (playPromise !== undefined) playPromise.catch(e => console.log(e));
-        }
+        if(correctSound) correctSound.play().catch(e=>{});
     } else {
-        // Wrong
         options[selectedIndex].classList.add('wrong');
         options[currentQ.answer].classList.add('correct');
-        
-        if(wrongSound) {
-            wrongSound.currentTime = 0;
-            let playPromise = wrongSound.play();
-            if (playPromise !== undefined) playPromise.catch(e => console.log(e));
-        }
+        if(wrongSound) wrongSound.play().catch(e=>{});
     }
     
-    setTimeout(nextQuestion, 2000);
+    if (isMultiplayer) {
+        // In multiplayer, send score to DB and wait for Host to push next question
+        if (!isHost) {
+            update(ref(db, `rooms/${roomPin}/players/${playerId}`), { score: score, hasAnswered: true });
+        }
+        if (isHost) {
+            // Host acts as the game engine, triggering the next question for everyone
+            setTimeout(hostNextQuestion, 4000);
+        }
+    } else {
+        setTimeout(nextQuestion, 2000);
+    }
+}
+
+function hostNextQuestion() {
+    const qList = getQuestions(currentClass, currentSubject);
+    if (currentQuestionIndex + 1 < qList.length) {
+        update(ref(db, `rooms/${roomPin}`), { currentQuestionIndex: currentQuestionIndex + 1 });
+    } else {
+        update(ref(db, `rooms/${roomPin}`), { status: 'finished' });
+    }
 }
 
 function nextQuestion() {
@@ -384,22 +567,52 @@ function showResults() {
         }, 20);
     }
 
-    // Max score is strictly 100 (10 questions * 10 points)
-    if (score >= 80) {
-        feedbackMessage.textContent = i18n[currentLang].feedbackOutstanding;
-    } else if (score >= 50) {
-        feedbackMessage.textContent = i18n[currentLang].feedbackGood;
-    } else {
-        feedbackMessage.textContent = i18n[currentLang].feedbackTry;
-    }
+    if (score >= 80) feedbackMessage.textContent = i18n[currentLang].feedbackOutstanding;
+    else if (score >= 50) feedbackMessage.textContent = i18n[currentLang].feedbackGood;
+    else feedbackMessage.textContent = i18n[currentLang].feedbackTry;
 }
 
-// Event Listeners
+// ---------------- Event Listeners ----------------
+
 langEnBtn.addEventListener('click', () => setLanguage('en'));
 langIdBtn.addEventListener('click', () => setLanguage('id'));
 
-startBtn.addEventListener('click', () => showScreen('class-screen'));
-backToStartFromClassBtn.addEventListener('click', () => showScreen('start-screen'));
+// Flow Updates
+startBtn.addEventListener('click', () => showScreen('mode-screen'));
+backToStartFromMode.addEventListener('click', () => showScreen('start-screen'));
+
+modeSingleBtn.addEventListener('click', () => {
+    isMultiplayer = false;
+    showScreen('class-screen');
+});
+modeMultiBtn.addEventListener('click', () => {
+    isMultiplayer = true;
+    showScreen('multi-hub-screen');
+});
+backToModeFromHub.addEventListener('click', () => showScreen('mode-screen'));
+
+multiHostBtn.addEventListener('click', () => {
+    isHost = true;
+    playerName = "Host";
+    showScreen('class-screen');
+});
+multiJoinBtn.addEventListener('click', () => {
+    isHost = false;
+    showScreen('join-screen');
+});
+backToHubFromJoin.addEventListener('click', () => showScreen('multi-hub-screen'));
+joinRoomBtn.addEventListener('click', joinFirebaseRoom);
+startMultiBtn.addEventListener('click', () => update(ref(db, `rooms/${roomPin}`), { status: 'playing' }));
+quitLobbyBtn.addEventListener('click', () => {
+    if (isHost && roomRef) remove(roomRef);
+    window.location.reload();
+});
+podiumHomeBtn.addEventListener('click', () => window.location.reload());
+
+backToStartFromClassBtn.addEventListener('click', () => {
+    if (isMultiplayer && isHost) showScreen('multi-hub-screen');
+    else showScreen('mode-screen');
+});
 
 classBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -407,13 +620,16 @@ classBtns.forEach(btn => {
         showScreen('subject-screen');
     });
 });
-
 backToClassFromSubjectBtn.addEventListener('click', () => showScreen('class-screen'));
 
 subjectBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
         const subject = e.currentTarget.getAttribute('data-subject');
-        initQuiz(subject);
+        if (isMultiplayer && isHost) {
+            createFirebaseRoom(subject);
+        } else {
+            initQuiz(subject);
+        }
     });
 });
 
@@ -429,37 +645,32 @@ homeBtn.addEventListener('click', () => showScreen('start-screen'));
 
 document.getElementById('quit-quiz-btn').addEventListener('click', () => {
     clearInterval(timer);
-    showScreen('subject-screen');
+    if (isMultiplayer) window.location.reload();
+    else showScreen('subject-screen');
 });
 
-// Initialize audio on first click anywhere
 document.body.addEventListener('click', () => {
     if (!audioInitialized) {
         audioInitialized = true;
-        mainBgm.volume = 0.3; // slightly lower volume for background music
+        mainBgm.volume = 0.3; 
         quizBgm.volume = 0.3;
         if (!document.getElementById('quiz-screen').classList.contains('active')) {
-            mainBgm.play().catch(e => console.log(e));
+            mainBgm.play().catch(e => {});
         }
     }
 }, true);
 
-// Add click and hover sounds to all buttons
 document.querySelectorAll('button').forEach(btn => {
-    // Click Sound
     btn.addEventListener('click', () => {
         const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         clickSound.volume = 0.5;
-        clickSound.play().catch(e => console.log('Click sound error:', e));
+        clickSound.play().catch(e => {});
     });
-    
-    // Hover Sound
     btn.addEventListener('mouseenter', () => {
-        // Browsers block audio until the first click, so we only play hover sounds after interaction
         if (audioInitialized) {
             const hoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-            hoverSound.volume = 0.6; // Increased volume so it's easier to hear
-            hoverSound.play().catch(e => console.log('Hover sound error:', e));
+            hoverSound.volume = 0.6; 
+            hoverSound.play().catch(e => {});
         }
     });
 });
