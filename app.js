@@ -442,8 +442,24 @@ function renderPlayerList() {
     });
 }
 
+function endSingleQuiz() {
+    if(quizBgm) quizBgm.pause();
+    if(mainBgm) {
+        mainBgm.currentTime = 0;
+        mainBgm.play().catch(e=>{});
+    }
+    
+    showScreen('podium-screen');
+}
+
 function showPodium() {
     showScreen('podium-screen');
+    if(quizBgm) quizBgm.pause();
+    if(mainBgm) {
+        mainBgm.currentTime = 0;
+        mainBgm.play().catch(e=>{});
+    }
+    
     const sortedPlayers = Object.values(playersData).sort((a, b) => b.score - a.score);
     
     if (sortedPlayers[0]) {
@@ -467,6 +483,13 @@ function initQuiz(subject) {
     currentQuestionIndex = 0;
     score = 0;
     scoreDisplay.textContent = score;
+    
+    // Switch BGM
+    if(mainBgm) mainBgm.pause();
+    if(quizBgm) {
+        quizBgm.currentTime = 0;
+        quizBgm.play().catch(e=>{});
+    }
     
     const qList = getQuestions(currentClass, currentSubject);
     totalQNum.textContent = qList.length;
@@ -524,8 +547,8 @@ function handleTimeout() {
     options.forEach(opt => opt.classList.add('disabled'));
     options[currentQ.answer].classList.add('correct');
     
-    // Play wrong sound (timeout = wrong)
-    const wSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+    // Play wrong sound (tet-tot buzzer)
+    const wSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3');
     wSound.volume = 0.6;
     wSound.play().catch(e=>{});
     
@@ -558,7 +581,7 @@ function selectAnswer(selectedIndex) {
     } else {
         options[selectedIndex].classList.add('wrong');
         options[currentQ.answer].classList.add('correct');
-        const wSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+        const wSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2954/2954-preview.mp3');
         wSound.volume = 0.6;
         wSound.play().catch(e=>{});
     }
@@ -713,6 +736,11 @@ document.querySelectorAll('button').forEach(btn => {
         const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         clickSound.volume = 0.5;
         clickSound.play().catch(e => {});
+        
+        // Start main BGM on first interaction if not playing
+        if (mainBgm && mainBgm.paused && document.getElementById('quiz-screen').classList.contains('active') === false) {
+            mainBgm.play().catch(e=>{});
+        }
     });
     btn.addEventListener('mouseenter', () => {
         if (audioInitialized) {
