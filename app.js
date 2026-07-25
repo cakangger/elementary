@@ -443,3 +443,14 @@ document.body.addEventListener('click', () => {
         }
     }
 }, true);
+
+// Add click sound to all buttons
+const clickSound = document.getElementById('click-sound');
+document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (clickSound) {
+            clickSound.currentTime = 0;
+            clickSound.play().catch(e => console.log(e));
+        }
+    });
+});
