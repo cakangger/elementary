@@ -212,8 +212,18 @@ const feedbackMessage = document.getElementById('feedback-message');
 
 const correctSound = document.getElementById('correct-sound');
 const wrongSound = document.getElementById('wrong-sound');
+// Audio elements
 const mainBgm = document.getElementById('main-bgm');
 const quizBgm = document.getElementById('quiz-bgm');
+if(mainBgm) mainBgm.volume = 0.3;
+if(quizBgm) quizBgm.volume = 0.3;
+
+// Global interaction to start BGM if autoplay is blocked
+document.body.addEventListener('click', () => {
+    if (mainBgm && mainBgm.paused && !document.getElementById('quiz-screen').classList.contains('active')) {
+        mainBgm.play().catch(e=>{});
+    }
+});
 
 // Multiplayer DOM
 const modeSingleBtn = document.getElementById('mode-single');
