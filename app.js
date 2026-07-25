@@ -1,6 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, update, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
 const firebaseConfig = {
     apiKey: "AIzaSyAf8jwUDifdo5TCcDmzQBRdLjmT8w5W8fo",
     authDomain: "elementaryquiz.firebaseapp.com",
@@ -10,8 +7,8 @@ const firebaseConfig = {
     appId: "1:517327642692:web:397ecf73521b31ca64dc11"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 // Data
 const questionsDb = {
@@ -294,8 +291,8 @@ function createFirebaseRoom(subject) {
     roomPin = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit pin
     lobbyPinDisplay.textContent = roomPin;
     
-    roomRef = ref(db, 'rooms/' + roomPin);
-    set(roomRef, {
+    roomRef = db.ref('rooms/' + roomPin);
+    roomRef.set({
         status: 'waiting',
         class: currentClass,
         subject: currentSubject,
@@ -303,7 +300,7 @@ function createFirebaseRoom(subject) {
         hostId: playerId
     });
     
-    onDisconnect(roomRef).remove(); // Auto-delete room if host leaves
+    roomRef.onDisconnect().remove(); // Auto-delete room if host leaves
     
     startMultiBtn.style.display = 'block';
     waitingHostText.style.display = 'none';
@@ -317,8 +314,8 @@ async function joinFirebaseRoom() {
     const pin = joinPinInput.value.trim();
     if (!name || !pin) return;
     
-    const rRef = ref(db, 'rooms/' + pin);
-    const snapshot = await get(rRef);
+    const rRef = db.ref('rooms/' + pin);
+    const snapshot = await rRef.get();
     if (snapshot.exists() && snapshot.val().status === 'waiting') {
         playerName = name;
         roomPin = pin;
@@ -327,9 +324,9 @@ async function joinFirebaseRoom() {
         currentClass = snapshot.val().class;
         currentSubject = snapshot.val().subject;
         
-        const playerRef = ref(db, `rooms/${pin}/players/${playerId}`);
-        set(playerRef, { name: playerName, score: 0, hasAnswered: false });
-        onDisconnect(playerRef).remove();
+        const playerRef = db.ref(`rooms/${pin}/players/${playerId}`);
+        playerRef.set({ name: playerName, score: 0, hasAnswered: false });
+        playerRef.onDisconnect().remove();
         
         startMultiBtn.style.display = 'none';
         waitingHostText.style.display = 'block';
@@ -345,18 +342,21 @@ async function joinFirebaseRoom() {
 
 function setupRoomListeners() {
     // Clear old listeners
-    dbListeners.forEach(unsub => unsub());
+    dbListeners.forEach(listener => listener.ref.off('value', listener.cb));
     dbListeners = [];
     
     // Listen to players joining/updating
-    const unsubPlayers = onValue(ref(db, `rooms/${roomPin}/players`), (snapshot) => {
+    const refPlayers = db.ref(`rooms/${roomPin}/players`);
+    const cbPlayers = (snapshot) => {
         playersData = snapshot.val() || {};
         renderPlayerList();
-    });
-    dbListeners.push(unsubPlayers);
+    };
+    refPlayers.on('value', cbPlayers);
+    dbListeners.push({ ref: refPlayers, cb: cbPlayers });
     
     // Listen to game status
-    const unsubStatus = onValue(ref(db, `rooms/${roomPin}/status`), (snapshot) => {
+    const refStatus = db.ref(`rooms/${roomPin}/status`);
+    const cbStatus = (snapshot) => {
         if (!snapshot.exists()) {
             if (document.getElementById('lobby-screen').classList.contains('active') || document.getElementById('quiz-screen').classList.contains('active')) {
                 alert(i18n[currentLang].quizComplete || "Room closed.");
@@ -371,11 +371,13 @@ function setupRoomListeners() {
         } else if (status === 'finished') {
             showPodium();
         }
-    });
-    dbListeners.push(unsubStatus);
+    };
+    refStatus.on('value', cbStatus);
+    dbListeners.push({ ref: refStatus, cb: cbStatus });
     
     // Listen to question changes
-    const unsubQ = onValue(ref(db, `rooms/${roomPin}/currentQuestionIndex`), (snapshot) => {
+    const refQ = db.ref(`rooms/${roomPin}/currentQuestionIndex`);
+    const cbQ = (snapshot) => {
         if (snapshot.exists()) {
             const newIndex = snapshot.val();
             if (newIndex > currentQuestionIndex && document.getElementById('quiz-screen').classList.contains('active')) {
@@ -383,8 +385,9 @@ function setupRoomListeners() {
                 loadQuestion();
             }
         }
-    });
-    dbListeners.push(unsubQ);
+    };
+    refQ.on('value', cbQ);
+    dbListeners.push({ ref: refQ, cb: cbQ });
 }
 
 function renderPlayerList() {
@@ -487,7 +490,7 @@ function handleTimeout() {
     
     if (isMultiplayer) {
         if (!isHost) {
-            update(ref(db, `rooms/${roomPin}/players/${playerId}`), { hasAnswered: true });
+            db.ref(`rooms/${roomPin}/players/${playerId}`).update({ hasAnswered: true });
         }
         if (isHost) setTimeout(hostNextQuestion, 4000);
     } else {
@@ -518,7 +521,7 @@ function selectAnswer(selectedIndex) {
     if (isMultiplayer) {
         // In multiplayer, send score to DB and wait for Host to push next question
         if (!isHost) {
-            update(ref(db, `rooms/${roomPin}/players/${playerId}`), { score: score, hasAnswered: true });
+            db.ref(`rooms/${roomPin}/players/${playerId}`).update({ score: score, hasAnswered: true });
         }
         if (isHost) {
             // Host acts as the game engine, triggering the next question for everyone
@@ -532,9 +535,9 @@ function selectAnswer(selectedIndex) {
 function hostNextQuestion() {
     const qList = getQuestions(currentClass, currentSubject);
     if (currentQuestionIndex + 1 < qList.length) {
-        update(ref(db, `rooms/${roomPin}`), { currentQuestionIndex: currentQuestionIndex + 1 });
+        db.ref(`rooms/${roomPin}`).update({ currentQuestionIndex: currentQuestionIndex + 1 });
     } else {
-        update(ref(db, `rooms/${roomPin}`), { status: 'finished' });
+        db.ref(`rooms/${roomPin}`).update({ status: 'finished' });
     }
 }
 
@@ -602,9 +605,9 @@ multiJoinBtn.addEventListener('click', () => {
 });
 backToHubFromJoin.addEventListener('click', () => showScreen('multi-hub-screen'));
 joinRoomBtn.addEventListener('click', joinFirebaseRoom);
-startMultiBtn.addEventListener('click', () => update(ref(db, `rooms/${roomPin}`), { status: 'playing' }));
+startMultiBtn.addEventListener('click', () => db.ref(`rooms/${roomPin}`).update({ status: 'playing' }));
 quitLobbyBtn.addEventListener('click', () => {
-    if (isHost && roomRef) remove(roomRef);
+    if (isHost && roomRef) roomRef.remove();
     window.location.reload();
 });
 podiumHomeBtn.addEventListener('click', () => window.location.reload());
