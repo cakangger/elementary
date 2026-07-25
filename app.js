@@ -445,12 +445,11 @@ document.body.addEventListener('click', () => {
 }, true);
 
 // Add click sound to all buttons
-const clickSound = document.getElementById('click-sound');
 document.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (clickSound) {
-            clickSound.currentTime = 0;
-            clickSound.play().catch(e => console.log(e));
-        }
+        // Use a new Audio object to allow overlapping sounds and use a highly reliable MP3 source
+        const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+        clickSound.volume = 0.5;
+        clickSound.play().catch(e => console.log('Click sound error:', e));
     });
 });
