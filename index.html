@@ -22,6 +22,20 @@
             <button id="start-btn" class="btn primary-btn pulse"><span id="t-startBtn">Play Now!</span></button>
         </div>
 
+        <!-- Class Selection Screen -->
+        <div id="class-screen" class="screen">
+            <h2 id="t-chooseClass">Choose Your Class</h2>
+            <div class="class-grid">
+                <button class="class-btn" data-class="1"><span id="t-class1">Class 1</span></button>
+                <button class="class-btn" data-class="2"><span id="t-class2">Class 2</span></button>
+                <button class="class-btn" data-class="3"><span id="t-class3">Class 3</span></button>
+                <button class="class-btn" data-class="4"><span id="t-class4">Class 4</span></button>
+                <button class="class-btn" data-class="5"><span id="t-class5">Class 5</span></button>
+                <button class="class-btn" data-class="6"><span id="t-class6">Class 6</span></button>
+            </div>
+            <button id="back-to-start-from-class" class="btn secondary-btn small"><span id="t-backClass">Back</span></button>
+        </div>
+
         <!-- Subject Selection Screen -->
         <div id="subject-screen" class="screen">
             <h2 id="t-chooseSubject">Choose Your Subject</h2>
@@ -39,7 +53,7 @@
                     <span class="icon">👩‍🚀</span> <span id="t-subjGeneral">Professions</span>
                 </button>
             </div>
-            <button id="back-to-start" class="btn secondary-btn small"><span id="t-back">Back</span></button>
+            <button id="back-to-class" class="btn secondary-btn small"><span id="t-backSubject">Back</span></button>
         </div>
 
         <!-- Quiz Screen -->
@@ -51,7 +65,7 @@
                         <span id="time-left">20</span>
                     </div>
                 </div>
-                <div class="question-tracker"><span id="t-question">Question </span><span id="current-q-num">1</span>/<span id="total-q-num">5</span></div>
+                <div class="question-tracker"><span id="t-question">Question </span><span id="current-q-num">1</span>/<span id="total-q-num">10</span></div>
             </div>
             <div class="question-container">
                 <h2 id="question-text">Question goes here...</h2>
@@ -70,6 +84,7 @@
             <div class="final-score-box">
                 <p id="t-finalScoreTitle">Your Final Score</p>
                 <h1 id="final-score">0</h1>
+                <p style="color: #666; font-size: 1.2rem; margin-top: 5px; font-weight: bold;">/ 100</p>
             </div>
             <p id="feedback-message">Great Job!</p>
             <div class="result-actions">

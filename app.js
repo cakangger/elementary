@@ -1,40 +1,70 @@
 const questionsDb = {
-    math: [
-        { q: {en: "What is 5 + 3?", id: "Berapa 5 + 3?"}, options: {en: ["6", "7", "8", "9"], id: ["6", "7", "8", "9"]}, answer: 2 },
-        { q: {en: "What is 10 - 4?", id: "Berapa 10 - 4?"}, options: {en: ["5", "6", "7", "8"], id: ["5", "6", "7", "8"]}, answer: 1 },
-        { q: {en: "What is 2 x 3?", id: "Berapa 2 x 3?"}, options: {en: ["5", "6", "8", "9"], id: ["5", "6", "8", "9"]}, answer: 1 },
-        { q: {en: "What is 12 / 4?", id: "Berapa 12 / 4?"}, options: {en: ["2", "3", "4", "5"], id: ["2", "3", "4", "5"]}, answer: 1 },
-        { q: {en: "What is 7 + 8?", id: "Berapa 7 + 8?"}, options: {en: ["14", "15", "16", "17"], id: ["14", "15", "16", "17"]}, answer: 1 }
-    ],
-    indo: [
-        { q: {en: "What is the antonym of 'Besar' (Big)?", id: "Apa antonim dari kata 'Besar'?"}, options: {en: ["Tinggi", "Kecil", "Luas", "Panjang"], id: ["Tinggi", "Kecil", "Luas", "Panjang"]}, answer: 1 },
-        { q: {en: "The capital city of Indonesia is?", id: "Ibukota negara Indonesia adalah?"}, options: {en: ["Bandung", "Surabaya", "Jakarta", "Medan"], id: ["Bandung", "Surabaya", "Jakarta", "Medan"]}, answer: 2 },
-        { q: {en: "Which animal crows in the morning?", id: "Hewan yang berkokok di pagi hari adalah?"}, options: {en: ["Kucing", "Anjing", "Ayam", "Burung"], id: ["Kucing", "Anjing", "Ayam", "Burung"]}, answer: 2 },
-        { q: {en: "What shines in the sky at night?", id: "Benda langit yang bersinar di malam hari?"}, options: {en: ["Matahari", "Bulan", "Awan", "Pelangi"], id: ["Matahari", "Bulan", "Awan", "Pelangi"]}, answer: 1 },
-        { q: {en: "What is the taste of salt?", id: "Rasa dari garam adalah?"}, options: {en: ["Manis", "Asin", "Pahit", "Asam"], id: ["Manis", "Asin", "Pahit", "Asam"]}, answer: 1 }
-    ],
-    english: [
-        { q: {en: "What is the color of an Apple?", id: "Apa warna dari buah Apel?"}, options: {en: ["Blue", "Yellow", "Red", "Black"], id: ["Biru", "Kuning", "Merah", "Hitam"]}, answer: 2 },
-        { q: {en: "Which animal says 'Meow'?", id: "Hewan apa yang bersuara 'Meong'?"}, options: {en: ["Dog", "Cat", "Cow", "Sheep"], id: ["Anjing", "Kucing", "Sapi", "Domba"]}, answer: 1 },
-        { q: {en: "One, Two, Three, ...?", id: "Satu, Dua, Tiga, ...?"}, options: {en: ["Five", "Six", "Four", "Ten"], id: ["Lima", "Enam", "Empat", "Sepuluh"]}, answer: 2 },
-        { q: {en: "What do we use to see?", id: "Bagian tubuh mana untuk melihat?"}, options: {en: ["Ears", "Nose", "Eyes", "Mouth"], id: ["Telinga", "Hidung", "Mata", "Mulut"]}, answer: 2 },
-        { q: {en: "Opposite of 'Hot' is?", id: "Lawan kata dari 'Panas' adalah?"}, options: {en: ["Warm", "Cold", "Boiling", "Sunny"], id: ["Hangat", "Dingin", "Mendidih", "Cerah"]}, answer: 1 }
-    ],
-    general: [
-        { q: {en: "Who treats sick animals?", id: "Siapa yang mengobati hewan sakit?"}, options: {en: ["Doctor", "Teacher", "Vet", "Pilot"], id: ["Dokter", "Guru", "Dokter Hewan", "Pilot"]}, answer: 2 },
-        { q: {en: "Who cooks food in a restaurant?", id: "Siapa yang memasak di restoran?"}, options: {en: ["Waiter", "Chef", "Farmer", "Police"], id: ["Pelayan", "Koki", "Petani", "Polisi"]}, answer: 1 },
-        { q: {en: "What do you call someone who flies an airplane?", id: "Siapa yang menerbangkan pesawat terbang?"}, options: {en: ["Driver", "Sailor", "Pilot", "Engineer"], id: ["Sopir", "Pelaut", "Pilot", "Insinyur"]}, answer: 2 },
-        { q: {en: "Who puts out fires?", id: "Siapa yang memadamkan api?"}, options: {en: ["Firefighter", "Police Officer", "Doctor", "Teacher"], id: ["Pemadam Kebakaran", "Polisi", "Dokter", "Guru"]}, answer: 0 },
-        { q: {en: "Who helps you learn in school?", id: "Siapa yang mengajarimu di sekolah?"}, options: {en: ["Nurse", "Teacher", "Singer", "Dancer"], id: ["Perawat", "Guru", "Penyanyi", "Penari"]}, answer: 1 }
-    ]
+    "1": { // Class 1 Questions
+        math: [
+            { q: {en: "What is 1 + 1?", id: "Berapa 1 + 1?"}, options: {en: ["1", "2", "3", "4"], id: ["1", "2", "3", "4"]}, answer: 1 },
+            { q: {en: "What is 2 + 2?", id: "Berapa 2 + 2?"}, options: {en: ["3", "4", "5", "6"], id: ["3", "4", "5", "6"]}, answer: 1 },
+            { q: {en: "What is 3 + 1?", id: "Berapa 3 + 1?"}, options: {en: ["2", "3", "4", "5"], id: ["2", "3", "4", "5"]}, answer: 2 },
+            { q: {en: "What is 5 - 1?", id: "Berapa 5 - 1?"}, options: {en: ["3", "4", "5", "6"], id: ["3", "4", "5", "6"]}, answer: 1 },
+            { q: {en: "What is 4 - 2?", id: "Berapa 4 - 2?"}, options: {en: ["1", "2", "3", "4"], id: ["1", "2", "3", "4"]}, answer: 1 },
+            { q: {en: "How many fingers on one hand?", id: "Berapa jumlah jari di satu tangan?"}, options: {en: ["4", "5", "6", "10"], id: ["4", "5", "6", "10"]}, answer: 1 },
+            { q: {en: "What is 10 - 5?", id: "Berapa 10 - 5?"}, options: {en: ["4", "5", "6", "7"], id: ["4", "5", "6", "7"]}, answer: 1 },
+            { q: {en: "What is 6 + 2?", id: "Berapa 6 + 2?"}, options: {en: ["7", "8", "9", "10"], id: ["7", "8", "9", "10"]}, answer: 1 },
+            { q: {en: "What is 9 - 1?", id: "Berapa 9 - 1?"}, options: {en: ["7", "8", "9", "10"], id: ["7", "8", "9", "10"]}, answer: 1 },
+            { q: {en: "What is 2 + 5?", id: "Berapa 2 + 5?"}, options: {en: ["5", "6", "7", "8"], id: ["5", "6", "7", "8"]}, answer: 2 }
+        ],
+        indo: [
+            { q: {en: "A is for...", id: "A untuk huruf awalan kata..."}, options: {en: ["Buku", "Ayam", "Kucing", "Bola"], id: ["Buku", "Ayam", "Kucing", "Bola"]}, answer: 1 },
+            { q: {en: "B is for...", id: "B untuk huruf awalan kata..."}, options: {en: ["Buku", "Ayam", "Kucing", "Meja"], id: ["Buku", "Ayam", "Kucing", "Meja"]}, answer: 0 },
+            { q: {en: "C is for...", id: "C untuk huruf awalan kata..."}, options: {en: ["Buku", "Ayam", "Cicak", "Bola"], id: ["Buku", "Ayam", "Cicak", "Bola"]}, answer: 2 },
+            { q: {en: "The opposite of Big is?", id: "Lawan kata Besar adalah?"}, options: {en: ["Kecil", "Tinggi", "Luas", "Panjang"], id: ["Kecil", "Tinggi", "Luas", "Panjang"]}, answer: 0 },
+            { q: {en: "The opposite of Hot is?", id: "Lawan kata Panas adalah?"}, options: {en: ["Hangat", "Dingin", "Cerah", "Mendung"], id: ["Hangat", "Dingin", "Cerah", "Mendung"]}, answer: 1 },
+            { q: {en: "We read a...", id: "Kita membaca sebuah..."}, options: {en: ["Baju", "Buku", "Sepatu", "Topi"], id: ["Baju", "Buku", "Sepatu", "Topi"]}, answer: 1 },
+            { q: {en: "We write with a...", id: "Kita menulis menggunakan..."}, options: {en: ["Pensil", "Piring", "Sendok", "Gelas"], id: ["Pensil", "Piring", "Sendok", "Gelas"]}, answer: 0 },
+            { q: {en: "The color of the sky is...", id: "Warna langit adalah..."}, options: {en: ["Merah", "Kuning", "Biru", "Hijau"], id: ["Merah", "Kuning", "Biru", "Hijau"]}, answer: 2 },
+            { q: {en: "The sun is...", id: "Matahari bentuknya..."}, options: {en: ["Kotak", "Segitiga", "Bulat", "Panjang"], id: ["Kotak", "Segitiga", "Bulat", "Panjang"]}, answer: 2 },
+            { q: {en: "Sugar tastes...", id: "Rasa gula adalah..."}, options: {en: ["Pahit", "Manis", "Asin", "Asam"], id: ["Pahit", "Manis", "Asin", "Asam"]}, answer: 1 }
+        ],
+        english: [
+            { q: {en: "What is this color: 🔴", id: "Apa warna ini: 🔴"}, options: {en: ["Blue", "Red", "Green", "Yellow"], id: ["Biru", "Merah", "Hijau", "Kuning"]}, answer: 1 },
+            { q: {en: "What is this color: 🔵", id: "Apa warna ini: 🔵"}, options: {en: ["Blue", "Red", "Green", "Yellow"], id: ["Biru", "Merah", "Hijau", "Kuning"]}, answer: 0 },
+            { q: {en: "Which animal is a Cat?", id: "Manakah yang merupakan Kucing?"}, options: {en: ["🐶", "🐱", "🐭", "🐰"], id: ["🐶", "🐱", "🐭", "🐰"]}, answer: 1 },
+            { q: {en: "Which animal is a Dog?", id: "Manakah yang merupakan Anjing?"}, options: {en: ["🐶", "🐱", "🐭", "🐰"], id: ["🐶", "🐱", "🐭", "🐰"]}, answer: 0 },
+            { q: {en: "How many apples? 🍎🍎", id: "Ada berapa apel? 🍎🍎"}, options: {en: ["One", "Two", "Three", "Four"], id: ["Satu", "Dua", "Tiga", "Empat"]}, answer: 1 },
+            { q: {en: "How many stars? ⭐⭐⭐", id: "Ada berapa bintang? ⭐⭐⭐"}, options: {en: ["One", "Two", "Three", "Four"], id: ["Satu", "Dua", "Tiga", "Empat"]}, answer: 2 },
+            { q: {en: "Hello means...", id: "Hello artinya..."}, options: {en: ["Halo", "Selamat Pagi", "Terima Kasih", "Maaf"], id: ["Halo", "Selamat Pagi", "Terima Kasih", "Maaf"]}, answer: 0 },
+            { q: {en: "Good Morning means...", id: "Good Morning artinya..."}, options: {en: ["Halo", "Selamat Pagi", "Terima Kasih", "Selamat Malam"], id: ["Halo", "Selamat Pagi", "Terima Kasih", "Selamat Malam"]}, answer: 1 },
+            { q: {en: "Thank you means...", id: "Thank you artinya..."}, options: {en: ["Halo", "Selamat Pagi", "Terima Kasih", "Sama-sama"], id: ["Halo", "Selamat Pagi", "Terima Kasih", "Sama-sama"]}, answer: 2 },
+            { q: {en: "Apple in Indonesian is...", id: "Apple dalam bahasa Indonesia adalah..."}, options: {en: ["Jeruk", "Apel", "Pisang", "Mangga"], id: ["Jeruk", "Apel", "Pisang", "Mangga"]}, answer: 1 }
+        ],
+        general: [
+            { q: {en: "Who teaches in a school?", id: "Siapa yang mengajar di sekolah?"}, options: {en: ["Doctor", "Teacher", "Police", "Farmer"], id: ["Dokter", "Guru", "Polisi", "Petani"]}, answer: 1 },
+            { q: {en: "Who helps sick people?", id: "Siapa yang merawat orang sakit?"}, options: {en: ["Doctor", "Teacher", "Singer", "Dancer"], id: ["Dokter", "Guru", "Penyanyi", "Penari"]}, answer: 0 },
+            { q: {en: "Who cooks food?", id: "Siapa yang memasak makanan?"}, options: {en: ["Chef", "Pilot", "Driver", "Farmer"], id: ["Koki", "Pilot", "Sopir", "Petani"]}, answer: 0 },
+            { q: {en: "Who flies airplanes?", id: "Siapa yang menerbangkan pesawat?"}, options: {en: ["Driver", "Sailor", "Pilot", "Doctor"], id: ["Sopir", "Pelaut", "Pilot", "Dokter"]}, answer: 2 },
+            { q: {en: "Who drives a bus?", id: "Siapa yang mengemudikan bus?"}, options: {en: ["Driver", "Sailor", "Pilot", "Teacher"], id: ["Sopir", "Pelaut", "Pilot", "Guru"]}, answer: 0 },
+            { q: {en: "Who catches bad guys?", id: "Siapa yang menangkap penjahat?"}, options: {en: ["Police", "Doctor", "Firefighter", "Chef"], id: ["Polisi", "Dokter", "Pemadam Kebakaran", "Koki"]}, answer: 0 },
+            { q: {en: "Who puts out fires?", id: "Siapa yang memadamkan api?"}, options: {en: ["Firefighter", "Police", "Doctor", "Teacher"], id: ["Pemadam Kebakaran", "Polisi", "Dokter", "Guru"]}, answer: 0 },
+            { q: {en: "Who grows food on a farm?", id: "Siapa yang menanam sayuran di sawah/kebun?"}, options: {en: ["Farmer", "Chef", "Doctor", "Teacher"], id: ["Petani", "Koki", "Dokter", "Guru"]}, answer: 0 },
+            { q: {en: "Who fixes our teeth?", id: "Siapa yang mengobati gigi kita?"}, options: {en: ["Dentist", "Eye Doctor", "Nurse", "Chef"], id: ["Dokter Gigi", "Dokter Mata", "Perawat", "Koki"]}, answer: 0 },
+            { q: {en: "Who builds houses?", id: "Siapa yang membangun rumah?"}, options: {en: ["Builder", "Teacher", "Doctor", "Pilot"], id: ["Tukang Bangunan", "Guru", "Dokter", "Pilot"]}, answer: 0 }
+        ]
+    }
 };
 
 const i18n = {
     en: {
         subtitle: "Are you ready to test your knowledge?",
         startBtn: "Play Now!",
+        chooseClass: "Choose Your Class",
+        class1: "Class 1",
+        class2: "Class 2",
+        class3: "Class 3",
+        class4: "Class 4",
+        class5: "Class 5",
+        class6: "Class 6",
         chooseSubject: "Choose Your Subject",
-        back: "Back",
+        backClass: "Back",
+        backSubject: "Back",
         score: "Score: ",
         question: "Question ",
         quizComplete: "Quiz Complete!",
@@ -52,8 +82,16 @@ const i18n = {
     id: {
         subtitle: "Apakah kamu siap menguji pengetahuanmu?",
         startBtn: "Mulai Bermain!",
+        chooseClass: "Pilih Kelasmu",
+        class1: "Kelas 1",
+        class2: "Kelas 2",
+        class3: "Kelas 3",
+        class4: "Kelas 4",
+        class5: "Kelas 5",
+        class6: "Kelas 6",
         chooseSubject: "Pilih Pelajaran",
-        back: "Kembali",
+        backClass: "Kembali",
+        backSubject: "Kembali",
         score: "Skor: ",
         question: "Pertanyaan ",
         quizComplete: "Kuis Selesai!",
@@ -72,6 +110,7 @@ const i18n = {
 
 // State Variables
 let currentLang = 'en';
+let currentClass = '1';
 let currentSubject = '';
 let currentQuestionIndex = 0;
 let score = 0;
@@ -79,11 +118,22 @@ let timer;
 let timeLeft = 20;
 const TIME_LIMIT = 20;
 
+// Helper to get questions, falling back to Class 1 if the selected class isn't fully populated yet
+function getQuestions(cls, subj) {
+    if (questionsDb[cls] && questionsDb[cls][subj] && questionsDb[cls][subj].length > 0) {
+        return questionsDb[cls][subj];
+    }
+    // Fallback to Class 1 questions if the class doesn't have its own database yet
+    return questionsDb["1"][subj];
+}
+
 // DOM Elements
 const screens = document.querySelectorAll('.screen');
 const startBtn = document.getElementById('start-btn');
+const classBtns = document.querySelectorAll('.class-btn');
 const subjectBtns = document.querySelectorAll('.subject-btn');
-const backToStartBtn = document.getElementById('back-to-start');
+const backToStartFromClassBtn = document.getElementById('back-to-start-from-class');
+const backToClassFromSubjectBtn = document.getElementById('back-to-class');
 const playAgainBtn = document.getElementById('play-again-btn');
 const homeBtn = document.getElementById('home-btn');
 
@@ -108,12 +158,20 @@ const wrongSound = document.getElementById('wrong-sound');
 // I18N DOM Elements
 const tSubtitle = document.getElementById('t-subtitle');
 const tStartBtn = document.getElementById('t-startBtn');
+const tChooseClass = document.getElementById('t-chooseClass');
+const tClass1 = document.getElementById('t-class1');
+const tClass2 = document.getElementById('t-class2');
+const tClass3 = document.getElementById('t-class3');
+const tClass4 = document.getElementById('t-class4');
+const tClass5 = document.getElementById('t-class5');
+const tClass6 = document.getElementById('t-class6');
 const tChooseSubject = document.getElementById('t-chooseSubject');
 const tSubjMath = document.getElementById('t-subjMath');
 const tSubjIndo = document.getElementById('t-subjIndo');
 const tSubjEnglish = document.getElementById('t-subjEnglish');
 const tSubjGeneral = document.getElementById('t-subjGeneral');
-const tBack = document.getElementById('t-back');
+const tBackClass = document.getElementById('t-backClass');
+const tBackSubject = document.getElementById('t-backSubject');
 const tScore = document.getElementById('t-score');
 const tQuestion = document.getElementById('t-question');
 const tQuizComplete = document.getElementById('t-quizComplete');
@@ -125,7 +183,6 @@ const tMainMenu = document.getElementById('t-mainMenu');
 function setLanguage(lang) {
     currentLang = lang;
     
-    // Update active button state
     if(lang === 'en') {
         langEnBtn.classList.add('active');
         langIdBtn.classList.remove('active');
@@ -137,12 +194,20 @@ function setLanguage(lang) {
     // Update static texts
     tSubtitle.textContent = i18n[lang].subtitle;
     tStartBtn.textContent = i18n[lang].startBtn;
+    tChooseClass.textContent = i18n[lang].chooseClass;
+    tClass1.textContent = i18n[lang].class1;
+    tClass2.textContent = i18n[lang].class2;
+    tClass3.textContent = i18n[lang].class3;
+    tClass4.textContent = i18n[lang].class4;
+    tClass5.textContent = i18n[lang].class5;
+    tClass6.textContent = i18n[lang].class6;
     tChooseSubject.textContent = i18n[lang].chooseSubject;
     tSubjMath.textContent = i18n[lang].subjMath;
     tSubjIndo.textContent = i18n[lang].subjIndo;
     tSubjEnglish.textContent = i18n[lang].subjEnglish;
     tSubjGeneral.textContent = i18n[lang].subjGeneral;
-    tBack.textContent = i18n[lang].back;
+    tBackClass.textContent = i18n[lang].backClass;
+    tBackSubject.textContent = i18n[lang].backSubject;
     tScore.textContent = i18n[lang].score;
     tQuestion.textContent = i18n[lang].question;
     tQuizComplete.textContent = i18n[lang].quizComplete;
@@ -152,7 +217,8 @@ function setLanguage(lang) {
     
     // Refresh question texts if in active quiz
     if (document.getElementById('quiz-screen').classList.contains('active')) {
-        const currentQ = questionsDb[currentSubject][currentQuestionIndex];
+        const qList = getQuestions(currentClass, currentSubject);
+        const currentQ = qList[currentQuestionIndex];
         questionText.textContent = currentQ.q[currentLang];
         currentQ.options[currentLang].forEach((opt, index) => {
             optTexts[index].textContent = opt;
@@ -170,14 +236,19 @@ function initQuiz(subject) {
     currentQuestionIndex = 0;
     score = 0;
     scoreDisplay.textContent = score;
-    totalQNum.textContent = questionsDb[subject].length;
+    
+    const qList = getQuestions(currentClass, currentSubject);
+    totalQNum.textContent = qList.length;
+    
     showScreen('quiz-screen');
     loadQuestion();
 }
 
 function loadQuestion() {
     resetState();
-    const currentQ = questionsDb[currentSubject][currentQuestionIndex];
+    const qList = getQuestions(currentClass, currentSubject);
+    const currentQ = qList[currentQuestionIndex];
+    
     questionText.textContent = currentQ.q[currentLang];
     currentQNum.textContent = currentQuestionIndex + 1;
     
@@ -196,7 +267,7 @@ function resetState() {
     
     options.forEach(opt => {
         opt.classList.remove('disabled', 'correct', 'wrong');
-        opt.style.backgroundColor = ''; // Reset inline styles from animation
+        opt.style.backgroundColor = '';
     });
 }
 
@@ -217,19 +288,16 @@ function startTimer() {
 }
 
 function handleTimeout() {
-    const currentQ = questionsDb[currentSubject][currentQuestionIndex];
+    const qList = getQuestions(currentClass, currentSubject);
+    const currentQ = qList[currentQuestionIndex];
     options.forEach(opt => opt.classList.add('disabled'));
     
-    // Highlight correct answer
     options[currentQ.answer].classList.add('correct');
     
-    // Play wrong sound on timeout as it's a failure
     if(wrongSound) {
         wrongSound.currentTime = 0;
         let playPromise = wrongSound.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => console.log("Audio play prevented:", error));
-        }
+        if (playPromise !== undefined) playPromise.catch(e => console.log(e));
     }
     
     setTimeout(nextQuestion, 2000);
@@ -237,22 +305,21 @@ function handleTimeout() {
 
 function selectAnswer(selectedIndex) {
     clearInterval(timer);
-    const currentQ = questionsDb[currentSubject][currentQuestionIndex];
+    const qList = getQuestions(currentClass, currentSubject);
+    const currentQ = qList[currentQuestionIndex];
     
     options.forEach(opt => opt.classList.add('disabled'));
     
     if (selectedIndex === currentQ.answer) {
-        // Correct
-        score += 100 + (timeLeft * 10); // Bonus for time
+        // Correct - strictly 10 points per answer (no time bonus)
+        score += 10; 
         scoreDisplay.textContent = score;
         options[selectedIndex].classList.add('correct');
         
         if(correctSound) {
             correctSound.currentTime = 0;
             let playPromise = correctSound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => console.log("Audio play prevented:", error));
-            }
+            if (playPromise !== undefined) playPromise.catch(e => console.log(e));
         }
     } else {
         // Wrong
@@ -262,9 +329,7 @@ function selectAnswer(selectedIndex) {
         if(wrongSound) {
             wrongSound.currentTime = 0;
             let playPromise = wrongSound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => console.log("Audio play prevented:", error));
-            }
+            if (playPromise !== undefined) playPromise.catch(e => console.log(e));
         }
     }
     
@@ -273,7 +338,8 @@ function selectAnswer(selectedIndex) {
 
 function nextQuestion() {
     currentQuestionIndex++;
-    if (currentQuestionIndex < questionsDb[currentSubject].length) {
+    const qList = getQuestions(currentClass, currentSubject);
+    if (currentQuestionIndex < qList.length) {
         loadQuestion();
     } else {
         showResults();
@@ -283,7 +349,6 @@ function nextQuestion() {
 function showResults() {
     showScreen('result-screen');
     
-    // Animate score counter
     let currentScoreAnim = 0;
     const increment = Math.max(1, Math.ceil(score / 50));
     
@@ -300,11 +365,10 @@ function showResults() {
         }, 20);
     }
 
-    const maxScore = questionsDb[currentSubject].length * (100 + (TIME_LIMIT * 10));
-
-    if (score > (maxScore * 0.7)) {
+    // Max score is strictly 100 (10 questions * 10 points)
+    if (score >= 80) {
         feedbackMessage.textContent = i18n[currentLang].feedbackOutstanding;
-    } else if (score > (maxScore * 0.4)) {
+    } else if (score >= 50) {
         feedbackMessage.textContent = i18n[currentLang].feedbackGood;
     } else {
         feedbackMessage.textContent = i18n[currentLang].feedbackTry;
@@ -315,8 +379,17 @@ function showResults() {
 langEnBtn.addEventListener('click', () => setLanguage('en'));
 langIdBtn.addEventListener('click', () => setLanguage('id'));
 
-startBtn.addEventListener('click', () => showScreen('subject-screen'));
-backToStartBtn.addEventListener('click', () => showScreen('start-screen'));
+startBtn.addEventListener('click', () => showScreen('class-screen'));
+backToStartFromClassBtn.addEventListener('click', () => showScreen('start-screen'));
+
+classBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        currentClass = e.currentTarget.getAttribute('data-class');
+        showScreen('subject-screen');
+    });
+});
+
+backToClassFromSubjectBtn.addEventListener('click', () => showScreen('class-screen'));
 
 subjectBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
