@@ -5,7 +5,7 @@ const firebaseConfig = {
     storageBucket: "elementaryquiz.firebasestorage.app",
     messagingSenderId: "517327642692",
     appId: "1:517327642692:web:397ecf73521b31ca64dc11",
-    databaseURL: "https://elementaryquiz-default-rtdb.asia-southeast1.firebasedatabase.app" // Attempting Asia region first as it's common for ID
+    databaseURL: "https://elementaryquiz-default-rtdb.firebaseio.com" // Attempting US Central default
 };
 
 firebase.initializeApp(firebaseConfig);
